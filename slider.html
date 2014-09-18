@@ -1,0 +1,285 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width">
+	<title>Title Goes Here</title>
+	<style>
+
+	#relcont {position:relative; width:600px; height:400px; overflow:hidden}
+
+  #placeholder {
+	  width:1800px;
+	  clip: rect(0px, 600px, 400px, 0px);
+	  line-height:10pt;
+	  font-family:Arial;
+	  font-size:10pt;
+	  line-height:14pt;
+  }
+
+  #placeholder h3 {line-height: 5pt;padding:0pt}
+  
+  .imag {position:relative; width:600px; height:400px; float:left; background:black;}
+
+  .cap {
+  	top: 300px; 
+	  background: rgba(0,0,0,0.5); 
+	  color: white; 
+	  position: absolute; 
+	  width: 600px; 
+	  height: 100px; 
+	  display: none;
+	  padding:10px;
+  }
+
+  .img {position: absolute; top: 0px;}
+
+  #content {
+	  float:left;
+    width:78%;
+	  background:white;
+    padding:1%;
+	  font-family:Century Gothic, "Century Gothic", "Apple Gothic";
+	  line-height: 20pt;
+  }
+	
+	</style>
+</head>
+
+<body>
+
+<div id="content">
+	
+	<div id="relcont">
+	
+	  <!-- this div contains all the images -->
+		<div id="placeholder">
+      
+      <div class="imag">
+				<img class="img"  src="images/picture1.jpg" alt="" width="600px" height="350px" onmouseover="show()" />
+				<div class="cap">
+					<h3 class="slideh">Title of first captioning</h3>
+					<p class="slidep">First captioning content</p>
+				</div>
+			</div>
+			
+			<div class="imag">
+				<img class="img"  src="images/picture2.jpg" alt="" width="600px" height="350px" onmouseover="show()" />
+				<div class="cap">
+					<h3 class="slideh">Title of second captioning</h3>
+					<p class="slidep">Second captioning content</p>
+				</div>
+			</div>
+			
+			<div class="imag">
+				<img class="img"  src="images/picture3.jpg" alt="" width="600px" height="350px" onmouseover="show()" />
+				<div class="cap">
+					<h3 class="slideh">Title of third captioning</h3>
+					<p class="slidep">Third captioning content</p>
+				</div>
+			</div>
+			
+		</div><!-- end placeholder -->
+	</div><!-- end relcontent -->
+
+
+
+
+<script type="text/javascript">
+// <![CDATA[
+
+// initial position of slider
+var posx = 0;
+
+// how many pixels to move per iteration
+var step = 100;
+
+// how fast move each step (in milliseconds)
+var tstep = 20;
+
+// instantiate imag
+var imag = 1;
+
+// pause in every slide
+var pause = 4000;
+
+// This will be the aspect ratio of the pictures
+var ratio = 9/16;
+
+// height in pixels of captioning block
+var capHeight = 100;
+
+// number of seconds to display captioning
+var time = 24000;
+
+
+window.onload = function () {
+	// New Slider
+
+	// size slider to max but still divisible by transitions step
+	sizeSlider = document.getElementById("content").offsetWidth - (document.getElementById("content").offsetWidth % step);;
+	
+	// make height proportional based on ratio
+	sizeSliderH = sizeSlider * (ratio);
+	
+	// global size to move slides
+	size = sizeSlider;
+	
+	// get number of slides
+	slideCount = document.getElementsByClassName("imag");
+	cap = document.getElementsByClassName("cap");
+	img = document.getElementsByClassName("img");
+	
+	// set width size
+	document.getElementById("relcont").style.width = sizeSlider + "px";
+	document.getElementById("placeholder").style.width = sizeSlider * slideCount.length + "px";
+	
+	// set height size
+	document.getElementById("relcont").style.height = sizeSliderH + "px";
+	document.getElementById("placeholder").style.height = sizeSliderH + "px";
+
+	// set size of each caption and image div
+	for (var i=0; i < slideCount.length; i++)
+	{
+		// set width
+		slideCount[i].style.width = sizeSlider + "px";
+		cap[i].style.width = sizeSlider + "px";
+		img[i].style.width = sizeSlider + "px";
+		
+		// set height
+		slideCount[i].style.height = sizeSliderH + "px";
+		cap[i].style.height = sizeSliderH - capHeight + "px"; // wait, shouldn't this be equal to 100 or capHeight???
+		img[i].style.height = sizeSliderH + "px";
+		
+		// set height of captioning div (diff. of images)
+		cap[i].style.top = sizeSliderH - capHeight + "px";
+	}
+	
+	// display captioning
+	show();
+	
+	// wait for a pause seconds and move slide
+	setTimeout ("slidediv()", pause);
+}
+
+
+/*
+ * this function moves a slide
+ */
+function slidediv() {
+	
+	// check if slide has moved a whole unit of size
+	if (posx >= -size + step) {
+		
+		// change position one step
+		posx = posx - step;
+		
+		// move all containers at the same time
+		for (var i = 0; i < slideCount.length; i++)
+		{
+			slideCount[i].style.left = posx+"px";
+		}
+		
+		// wait a unit of time
+		setTimeout ("slidediv()", tstep);
+	}
+	
+	// if slide finished one unit of size of movement
+	else {
+	
+		// if there is another slide
+		if (size < (sizeSlider * (slideCount.length - 1)))
+		{
+			
+			// increase size
+			size = size + sizeSlider;
+			
+			// make a long pause before we change to the next slide
+			setTimeout ("slidediv()", pause);
+		}
+		
+		// if this is the last slide
+		else
+		{
+			// reset size variable
+			size = sizeSlider;
+			
+			// pause and go to end function
+			setTimeout("end()", pause);
+			return;
+		}
+		
+	}
+}
+
+/**
+ * this function is for returning slides
+ * to their original position
+ **/
+function end() {
+	
+	// check if slide is not on origin yet
+	if (posx < 0) {
+	
+	  // move position one step
+		posx = posx + step;
+		
+		// move all elements at once
+		for (var i = 0; i < slideCount.length; i++) {
+			slideCount[i].style.left = posx+"px";
+		}
+		
+		// 
+		setTimeout ("end()", tstep);
+	}
+	
+	// if arrived at original position
+	else {
+	
+	  // make sure each slide is at origin
+		for (var i = 0; i < slideCount.length; i++)
+		{
+			slideCount[i].style.left = posx+"px";
+		}
+		
+		// wait a pause and move slide
+		setTimeout ("slidediv()", pause);
+	}
+}
+
+/**
+ * This function display the captioning for a number of seconds
+ */
+function show() {
+	
+	// if function is running, reset timer
+	if (time != null) {
+		clearTimeout(time);
+	}
+	
+	// iterate and display each block of captioning
+	for (var i = 0; i < slideCount.length; i++) {
+		cap[i].style.display = "block";
+		
+	}
+	
+	// display captioning for a number of seconds and then hide them
+	time=setTimeout ("hide()", time);
+}
+
+
+// this function hides the captioning
+function hide() {
+
+  // hide each caption block
+	for (var i = 0; i < slideCount.length; i++) {
+		cap[i].style.display = "hide";
+		
+	}
+	clearTimeout(time);
+}
+
+
+// ]]>
+</script>
+</body>
+</html>
